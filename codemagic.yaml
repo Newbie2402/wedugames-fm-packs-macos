@@ -32,10 +32,33 @@ workflows:
             node_modules/.bin/terser "ui/$js" --compress --mangle --comments false -o "ui/dist/$js"
           done
           cp ui/index.html ui/style.css ui/brand.png ui/dist/
-      - name: Build universal .app + .dmg
+      - name: Build universal .app
         script: |
           source "$HOME/.cargo/env" 2>/dev/null || true
           npx @tauri-apps/cli@2 build --target universal-apple-darwin
+      - name: Package .dmg (headless, no Finder)
+        script: |
+          set -e
+          base="target/universal-apple-darwin/release/bundle"
+          app="$base/macos/Wedugames FM Packs.app"
+          dmgdir="$base/dmg"
+          dmg="$dmgdir/Wedugames FM Packs.dmg"
+          if [ ! -d "$app" ]; then
+            echo "App bundle not found at $app" >&2
+            exit 1
+          fi
+          # Tauri's own .dmg step drives Finder via AppleScript and fails on a
+          # headless CI runner, so build the .dmg ourselves with hdiutil: the
+          # .app plus a drag-to-Applications symlink, UDZO-compressed.
+          rm -f "$dmg"
+          mkdir -p "$dmgdir"
+          stage="$(mktemp -d)"
+          cp -R "$app" "$stage/"
+          ln -s /Applications "$stage/Applications"
+          hdiutil create -volname "Wedugames FM Packs" \
+            -srcfolder "$stage" -ov -format UDZO "$dmg"
+          rm -rf "$stage"
+          ls -lh "$dmg"
     artifacts:
       - target/universal-apple-darwin/release/bundle/dmg/*.dmg
       - target/universal-apple-darwin/release/bundle/macos/*.app
