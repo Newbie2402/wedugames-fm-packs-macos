@@ -19,6 +19,13 @@ on:
 jobs:
   build:
     runs-on: macos-14
+    # Secrets can't be read in a step `if:`, so expose them as env (env is
+    # allowed there). Signing/notarization runs only when they are set.
+    env:
+      APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,12 +59,7 @@ jobs:
           npx @tauri-apps/cli@2 build --target universal-apple-darwin
 
       - name: Sign and notarize (runs when the secrets are set)
-        if: ${{ secrets.APPLE_SIGN_IDENTITY != '' }}
-        env:
-          APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        if: ${{ env.APPLE_SIGN_IDENTITY != '' }}
         run: |
           app="target/universal-apple-darwin/release/bundle/macos/Wedugames FM Packs.app"
           dmg="target/universal-apple-darwin/release/bundle/dmg/Wedugames FM Packs.dmg"
