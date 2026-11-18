@@ -58,3 +58,8 @@ icns = struct.pack(">4sI", b"icns", 8 + len(body)) + body
 with open("src-tauri/icons/icon.icns", "wb") as f:
     f.write(icns)
 print("src-tauri/icons/icon.icns")
+
+# Tauri's generate_context! embeds a PNG as the default window icon on macOS/Linux
+# (the .icns is only the bundle/dock icon), so emit a 1024px icon.png too.
+tile(w, 1024).save("src-tauri/icons/icon.png", format="PNG")
+print("src-tauri/icons/icon.png")
