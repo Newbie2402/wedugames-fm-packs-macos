@@ -44,9 +44,6 @@ jobs:
       - name: npm install
         run: npm install --no-audit --no-fund
 
-      - name: Python deps for the icon
-        run: python3 -m pip install --user pillow numpy
-
       - name: Build universal .app + .dmg
         run: |
           # Frontend: ui/dist is gitignored, so regenerate it here exactly like
@@ -56,8 +53,7 @@ jobs:
             node_modules/.bin/terser "ui/$js" --compress --mangle --comments false -o "ui/dist/$js"
           done
           cp ui/index.html ui/style.css ui/brand.png ui/dist/
-          # Icon, then the universal (Intel + Apple Silicon) bundle.
-          python3 scripts/make_icns.py
+          # icon.icns is committed, so just build the universal bundle.
           npx @tauri-apps/cli@2 build --target universal-apple-darwin
 
       - name: Sign and notarize (runs when the secrets are set)

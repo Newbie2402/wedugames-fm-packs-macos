@@ -1,0 +1,41 @@
+# Codemagic CI — free macOS build on Apple Silicon, no payment method needed.
+#
+# Setup (one time):
+#   1. Sign up at https://codemagic.io with your GitHub account (free plan).
+#   2. Add application -> pick this repo (wedugames-fm-packs-macos).
+#   3. Codemagic auto-detects this file; start the "macos-universal" workflow.
+#   4. When it finishes, download the .dmg from the build's Artifacts.
+#
+# The build produces a universal (Intel + Apple Silicon) .app and .dmg.
+# icon.icns is committed, so no Python/Pillow step is needed here.
+workflows:
+  macos-universal:
+    name: Wedugames FM Packs - macOS universal
+    # Free plan instance. If this name is rejected, try: mac_mini_m2
+    instance_type: mac_mini_m1
+    max_build_duration: 90
+    environment:
+      node: 22
+    scripts:
+      - name: Rust toolchain + Apple targets
+        script: |
+          if ! command -v rustup >/dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            source "$HOME/.cargo/env"
+          fi
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: Build frontend (ui/dist)
+        script: |
+          npm install --no-audit --no-fund
+          rm -rf ui/dist && mkdir -p ui/dist
+          for js in art.js main.js; do
+            node_modules/.bin/terser "ui/$js" --compress --mangle --comments false -o "ui/dist/$js"
+          done
+          cp ui/index.html ui/style.css ui/brand.png ui/dist/
+      - name: Build universal .app + .dmg
+        script: |
+          source "$HOME/.cargo/env" 2>/dev/null || true
+          npx @tauri-apps/cli@2 build --target universal-apple-darwin
+    artifacts:
+      - target/universal-apple-darwin/release/bundle/dmg/*.dmg
+      - target/universal-apple-darwin/release/bundle/macos/*.app
