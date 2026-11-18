@@ -18,7 +18,9 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    # Standard GitHub-hosted macOS runner (free tier). A macOS host can build
+    # both arches, so the universal (Intel + Apple Silicon) bundle works here.
+    runs-on: macos-13
     # Secrets can't be read in a step `if:`, so expose them as env (env is
     # allowed there). Signing/notarization runs only when they are set.
     env:
