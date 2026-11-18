@@ -1,0 +1,79 @@
+# Builds the macOS customer app without owning a Mac: GitHub's macOS runner
+# produces a universal (Intel + Apple Silicon) .app and .dmg.
+#
+# Push this folder to a GitHub repo, then: Actions -> "Build macOS" -> Run
+# workflow (or push a tag v*). The .app/.dmg lands in the workflow artifacts.
+#
+# To also sign + notarize, add repository secrets:
+#   APPLE_SIGN_IDENTITY        e.g. "Developer ID Application: Your Name (TEAMID)"
+#   APPLE_ID                   your Apple ID
+#   APPLE_TEAM_ID              your team ID
+#   APPLE_APP_SPECIFIC_PASSWORD  app-specific password (appleid.apple.com)
+name: Build macOS
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: npm install
+        run: npm install --no-audit --no-fund
+
+      - name: Python deps for the icon
+        run: python3 -m pip install --user pillow numpy
+
+      - name: Build universal .app + .dmg
+        run: |
+          # Frontend: ui/dist is gitignored, so regenerate it here exactly like
+          # scripts/build-macos.sh (minify + mangle) before Tauri bundles it in.
+          rm -rf ui/dist && mkdir -p ui/dist
+          for js in art.js main.js; do
+            node_modules/.bin/terser "ui/$js" --compress --mangle --comments false -o "ui/dist/$js"
+          done
+          cp ui/index.html ui/style.css ui/brand.png ui/dist/
+          # Icon, then the universal (Intel + Apple Silicon) bundle.
+          python3 scripts/make_icns.py
+          npx @tauri-apps/cli@2 build --target universal-apple-darwin
+
+      - name: Sign and notarize (runs when the secrets are set)
+        if: ${{ secrets.APPLE_SIGN_IDENTITY != '' }}
+        env:
+          APPLE_SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          app="target/universal-apple-darwin/release/bundle/macos/Wedugames FM Packs.app"
+          dmg="target/universal-apple-darwin/release/bundle/dmg/Wedugames FM Packs.dmg"
+          codesign --force --options runtime --timestamp --sign "$APPLE_SIGN_IDENTITY" "$app"
+          profile="fm-packs-notary"
+          xcrun notarytool store-credentials "$profile" \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD"
+          xcrun notarytool submit "$dmg" --keychain-profile "$profile" --wait
+          xcrun stapler staple "$dmg"
+          xcrun stapler staple "$app"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wedugames-fm-packs-macos
+          path: |
+            target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            target/universal-apple-darwin/release/bundle/macos/*.app
+          if-no-files-found: error

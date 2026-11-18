@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wedugames FM Packs</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="art.js" defer></script>
+    <script src="main.js" defer></script>
+  </head>
+  <body>
+    <header class="titlebar" data-tauri-drag-region>
+      <div class="brand" data-tauri-drag-region>
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name" data-tauri-drag-region>WEDUGAMES <b>FM PACKS</b></span>
+      </div>
+      <div class="window-buttons">
+        <button id="win-min" type="button" aria-label="Minimize">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8" /></svg>
+        </button>
+        <button id="win-max" type="button" aria-label="Maximize">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2.5" y="2.5" width="7" height="7" rx="1" /></svg>
+        </button>
+        <button id="win-close" class="close" type="button" aria-label="Tutup">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <nav id="nav" aria-label="Kategori"></nav>
+        <div class="side-foot">
+          <div class="game-chip">
+            <span id="game-dot" class="dot"></span>
+            <div>
+              <div class="game-title">Football Manager 27</div>
+              <div id="game-detail" class="game-detail">Mencari game…</div>
+            </div>
+          </div>
+          <button id="pick-graphics" class="ghost wide temp-button" type="button">
+            <span class="temp-label">Folder graphics FM</span>
+            <span id="graphics-path" class="temp-path">Otomatis</span>
+          </button>
+          <button id="pick-temp" class="ghost wide temp-button" type="button">
+            <span class="temp-label">Folder download sementara</span>
+            <span id="temp-path" class="temp-path">Otomatis</span>
+          </button>
+          <button id="repair-all-side" class="ghost wide repair-action-button" type="button">Perbaiki Semua Pack</button>
+          <button id="verify" class="ghost wide" type="button">Cek Kelengkapan File</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="hero" class="hero">
+          <div class="hero-text">
+            <p id="hero-eyebrow" class="eyebrow"></p>
+            <h1 id="hero-title"></h1>
+            <p id="hero-sub"></p>
+          </div>
+          <button id="update-all" class="primary" type="button" hidden>Update semua</button>
+        </section>
+        <div id="grid" class="grid"></div>
+      </main>
+    </div>
+
+    <footer class="dock">
+      <div id="dock-idle" class="dock-row">
+        <div class="dock-info">
+          <div id="dock-title" class="dock-title"></div>
+          <div id="dock-sub" class="dock-sub"></div>
+        </div>
+        <button id="run" class="primary big" type="button" disabled>Pasang</button>
+      </div>
+      <div id="dock-busy" class="dock-row" hidden>
+        <div class="dock-progress">
+          <div class="dock-progress-head">
+            <span id="progress-label" class="dock-title"></span>
+            <span id="progress-percent" class="percent">0%</span>
+          </div>
+          <div class="bar"><div id="bar-fill" class="bar-fill"></div></div>
+          <div id="progress-detail" class="dock-sub"></div>
+        </div>
+        <button id="cancel" class="ghost" type="button">Batal</button>
+      </div>
+    </footer>
+
+    <div id="gate" class="gate" hidden>
+      <form id="gate-form" class="gate-card">
+        <span class="brand-mark large" aria-hidden="true"></span>
+        <h2 id="gate-title"></h2>
+        <p id="gate-text"></p>
+        <label id="gate-label" for="gate-input"></label>
+        <input id="gate-input" autocomplete="off" spellcheck="false" />
+        <p id="gate-error" class="gate-error" role="alert"></p>
+        <button class="primary big wide" type="submit">Lanjut</button>
+      </form>
+    </div>
+
+    <div id="register" class="gate" hidden>
+      <form id="register-form" class="gate-card">
+        <span class="brand-mark large" aria-hidden="true"></span>
+        <h2>Aktivasi Wedugames FM Packs</h2>
+        <p>Masukkan License Key, nomor WhatsApp, atau email yang terdaftar di akun WeduGames kamu.</p>
+        <label for="register-input">License Key / WhatsApp / Email</label>
+        <input id="register-input" autocomplete="off" spellcheck="false" placeholder="FMP-XXXX-XXXX-XXXX" />
+        <p id="register-error" class="gate-error" role="alert"></p>
+        <button id="register-move" class="ghost wide" type="button" hidden>Pindahkan license ke PC ini</button>
+        <button id="register-ok" class="primary big wide" type="submit">Aktifkan</button>
+      </form>
+    </div>
+
+    <dialog id="confirm">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-text"></p>
+      <div class="confirm-actions">
+        <button id="confirm-no" class="ghost" type="button">Batal</button>
+        <button id="confirm-yes" class="danger" type="button">Uninstall</button>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>

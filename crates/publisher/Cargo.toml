@@ -1,0 +1,26 @@
+[package]
+name = "publisher"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+fmup-core = { path = "../core" }
+packer = { path = "../packer" }
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+ed25519-dalek.workspace = true
+aws-sdk-s3 = { version = "1", features = ["behavior-version-latest"] }
+aws-smithy-types = "1"
+futures-util = "0.3"
+regex = "1"
+ureq = { version = "2", features = ["tls"] }
+tokio = { version = "1", features = ["rt-multi-thread", "fs", "macros"] }
+
+[dev-dependencies]
+hex.workspace = true
+sha2.workspace = true
+tempfile = "3"
+tiny_http = "0.12"
+zip.workspace = true
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

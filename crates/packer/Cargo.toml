@@ -1,0 +1,21 @@
+[package]
+name = "packer"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+fmup-core = { path = "../core" }
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+hex.workspace = true
+ed25519-dalek.workspace = true
+zip.workspace = true
+clap = { version = "4", features = ["derive"] }
+crc32fast = "1"
+rand = "0.8"
+walkdir = "2"
+
+[dev-dependencies]
+tempfile = "3"

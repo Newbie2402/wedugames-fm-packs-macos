@@ -1,0 +1,20 @@
+[package]
+name = "wedugames-fm-packs"
+version.workspace = true
+edition.workspace = true
+
+[features]
+# Sample packs and a simulated install, for looking at the UI. Never ship this.
+demo = []
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+fmup-core = { path = "../crates/core" }
+anyhow.workspace = true
+base64 = "0.22"
+serde.workspace = true
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tokio = { version = "1", features = ["time"] }

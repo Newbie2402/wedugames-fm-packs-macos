@@ -1,0 +1,8 @@
+{
+  "name": "wedugames-fm-packs-build",
+  "private": true,
+  "description": "Build tooling for the customer app frontend (minify + mangle before bundling into the exe).",
+  "devDependencies": {
+    "terser": "5.37.0"
+  }
+}

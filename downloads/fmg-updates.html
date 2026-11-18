@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Update FMG Logos</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0a0e13; color: #eef3f7; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { margin: 0 0 6px; font-size: 26px; }
+  h2 { margin: 24px 0 8px; font-size: 17px; }
+  p { margin: 0; color: #8d9ba9; }
+  .bar { position: sticky; top: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; padding: 12px 0; background: #0a0e13; }
+  button { padding: 9px 18px; border: 0; border-radius: 8px; background: #2ee6a6; color: #04221a; font: 700 15px "Segoe UI", sans-serif; cursor: pointer; }
+  button.quiet { background: #1e2833; color: #eef3f7; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  label { color: #8d9ba9; }
+  input[type="number"] { width: 64px; padding: 6px; border: 1px solid #24303c; border-radius: 6px; background: #10161d; color: #eef3f7; font: inherit; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { display: flex; gap: 12px; padding: 6px 10px; border-top: 1px solid #1e2833; }
+  li.done a { color: #5f6b76; text-decoration: line-through; }
+  li span { margin-left: auto; color: #8d9ba9; white-space: nowrap; }
+  a { color: #7fd8ff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Update FMG Logos</h1>
+  <p>Buka halaman ini di Chrome yang sudah login. Izinkan pop-up, lalu klik Mulai. Biarkan halaman ini terbuka sampai selesai.</p>
+  <div class="bar">
+    <button id="start" type="button">Mulai</button>
+    <button id="stop" class="quiet" type="button" disabled>Berhenti</button>
+    <label>Jeda <input id="gap" type="number" min="3" value="6" /> detik</label>
+    <span id="status" role="status"></span>
+  </div>
+  <div id="list"></div>
+</main>
+<script>
+const BASE = "https://footballmanagergraphics.com/files/file/";
+const PACKS = {
+  "FMG Logos": [["2026.01","989-fm26-fmg-logos-202601",376.22],["2026.02","1018-fm26-fmg-logos-202602",278.29],["2026.03","1043-fm26-fmg-logos-202603",218.59],["2026.04","1069-fmg-logos-202604",173.44],["2026.05","1103-fm26-fmg-logos-update-202605",314.14],["2026.06","1128-fm26-fmg-logos-update-202606",132.53],["2026.07","1152-fm26-fmg-logos-update-202607",275.91],["2026.08","1183-fm26-fmg-logos-update-202608",41.93],["2026.09","1208-fm26-fmg-logos-202609",150.13],["2026.10","1235-fm26-fmg-logos-update-202610",190.06],["2026.11","1259-fm26-fmg-logos-update-202611",225.22]],
+  "FMG Standard Logos": [["2026.01","991-fm26-fmg-standard-logos-202601",167.59],["2026.02","1020-fm26-fmg-standard-logos-202602",133.88],["2026.03","1045-fm26-fmg-standard-logos-202603",106.13],["2026.04","1071-fmg-standard-logos-202604",110.05],["2026.05","1105-fm26-fmg-standard-logos-update-202605",142.88],["2026.06","1130-fm26-fmg-standard-logos-update-202606",72.72],["2026.07","1154-fm26-fmg-standard-logos-update-202607",162.7],["2026.08","1185-fm26-fmg-standard-logos-update-202608",19.24],["2026.09","1210-fm26-fmg-standard-logos-update-202609",86.03],["2026.10","1237-fm26-fmg-standard-logos-update-202610",93.29],["2026.11","1261-fm26-fmg-standard-logos-update-202611",119.23]],
+  "FMV Logos": [["2026.01","994-fm26-fmv-logos-202601",194.28],["2026.02","1023-fm26-fmv-logos-202602",156.23],["2026.03","1048-fm26-fmv-logos-202603",121.71],["2026.04","1074-fmv-logos-202604",108.51],["2026.05","1108-fm26-fmv-logos-update-202605",168.83],["2026.06","1133-fm26-fmv-logos-update-202606",75.24],["2026.07","1157-fm26-fmv-logos-update-202607",164.11],["2026.08","1188-fm26-fmv-logos-update-202608",22.91],["2026.09","1213-fm26-fmv-logos-update-202609",86.61],["2026.10","1240-fm26-fmv-logos-update-202610",107.41],["2026.11","1264-fm26-fmv-logos-update-202611",130.13]],
+  "FMG Steel Logos": [["2026.01","992-fm26-fmg-steel-logos-202601",369.86],["2026.02","1021-fm26-fmg-steel-logos-202602",280.88],["2026.03","1046-fm26-fmg-steel-logos-202603",220.97],["2026.04","1072-fmg-steel-logos-202604",171.6],["2026.05","1106-fm26-fmg-steel-logos-update-202605",318.21],["2026.06","1131-fm26-fmg-steel-logos-update-202606",133.4],["2026.07","1155-fm26-fmg-steel-logos-update-202607",271.23],["2026.08","1186-fm26-fmg-steel-logos-update-202608",42.19],["2026.09","1211-fm26-fmg-steel-logos-update-202609",149.71],["2026.10","1238-fm26-fmg-steel-logos-update-202610",190.81],["2026.11","1262-fm26-fmg-steel-logos-update-202611",227.07]],
+  "FMG Vapour Logos": [["2026.01","993-fm26-fmg-vapour-logos-202601",397.85],["2026.02","1022-fm26-fmg-vapour-logos-202602",294.88],["2026.03","1047-fm26-fmg-vapour-logos-202603",236.02],["2026.04","1073-fmg-vapour-logos-202604",178.01],["2026.05","1107-fm26-fmg-vapour-logos-update-202605",339.94],["2026.06","1132-fm26-fmg-vapour-logos-update-202606",141.07],["2026.07","1156-fm26-fmg-vapour-logos-update-202607",281.43],["2026.08","1187-fm26-fmg-vapour-logos-update-202608",44.46],["2026.09","1212-fm26-fmg-vapour-logos-update-202609",156.53],["2026.10","1239-fm26-fmg-vapour-logos-update-202610",200.13],["2026.11","1263-fm26-fmg-vapour-logos-update-202611",238.32]],
+  "FMG Plastic Logos": [["2026.01","990-fm26-fmg-plastic-logos-202601",305.58],["2026.02","1019-fm26-fmg-plastic-logos-202602",235.92],["2026.03","1044-fm26-fmg-plastic-logos-202603",186.95],["2026.04","1070-fmg-plastic-logos-202604",151.33],["2026.05","1104-fm26-fmg-plastic-logos-update-202605",268.04],["2026.06","1129-fm26-fmg-plastic-logos-update-202606",113.24],["2026.07","1153-fm26-fmg-plastic-logos-update-202607",236.19],["2026.08","1184-fm26-fmg-plastic-logos-update-202608",35.46],["2026.09","1209-fm26-fmg-plastic-logos-202609",128.09],["2026.10","1236-fm26-fmg-plastic-logos-update-202610",163.85],["2026.11","1260-fm26-fmg-plastic-logos-update-202611",194.88]],
+  "FMG Grunge Logos": [["2026.01","987-fm26-fmg-grunge-logos-202601",348.77],["2026.02","1016-fm26-fmg-grunge-logos-202602",267.02],["2026.03","1041-fm26-fmg-grunge-logos-202603",211.3],["2026.04","1067-fmg-grunge-logos-update-202604",158.46],["2026.05","1101-fm26-fmg-grunge-logos-update-202605",305.5],["2026.06","1126-fm26-fmg-grunge-logos-202606",126.8],["2026.07","1150-fm26-fmg-grunge-logos-202607",249.93],["2026.08","1181-fm26-fmg-grunge-logos-update-202608",41.47],["2026.09","1206-fm26-fmg-grunge-logos-202609",140.15],["2026.10","1233-fm26-fmg-grunge-logos-202610",179.86],["2026.11","1257-fm26-fmg-grunge-logos-update-202611",207.39]],
+};
+
+const $ = (id) => document.getElementById(id);
+const items = [];
+for (const [pack, updates] of Object.entries(PACKS)) {
+  const list = document.createElement("ul");
+  for (const [version, slug, size] of updates) {
+    const row = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = `${BASE}${slug}/?do=download`;
+    link.target = "_blank";
+    link.textContent = `${pack} ${version}`;
+    link.addEventListener("click", () => row.classList.add("done"));
+    const weight = document.createElement("span");
+    weight.textContent = `${size} MB`;
+    row.append(link, weight);
+    list.append(row);
+    items.push({ row, url: link.href });
+  }
+  const title = document.createElement("h2");
+  title.textContent = pack;
+  $("list").append(title, list);
+}
+
+let timer = null;
+function report(text) { $("status").textContent = text; }
+
+function finish(text) {
+  clearTimeout(timer);
+  timer = null;
+  $("start").disabled = false;
+  $("stop").disabled = true;
+  report(text);
+}
+
+function next() {
+  const pending = items.filter((item) => !item.row.classList.contains("done"));
+  if (!pending.length) return finish(`Selesai, ${items.length} download dikirim.`);
+  const item = pending[0];
+  const tab = window.open(item.url, "_blank");
+  if (!tab) return finish("Pop-up diblokir. Izinkan pop-up untuk halaman ini, lalu klik Mulai lagi.");
+  item.row.classList.add("done");
+  const gap = Math.max(3, Number($("gap").value) || 6) * 1000;
+  setTimeout(() => { try { tab.close(); } catch {} }, gap - 1000);
+  report(`${items.length - pending.length + 1} dari ${items.length}`);
+  timer = setTimeout(next, gap);
+}
+
+$("start").addEventListener("click", () => {
+  $("start").disabled = true;
+  $("stop").disabled = false;
+  next();
+});
+$("stop").addEventListener("click", () => finish("Dihentikan. Klik Mulai untuk lanjut dari yang belum."));
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+target/
+demo/
+target-demo/
+node_modules/
+dist/
+keys/
+.wrangler/
+.dev.vars
+.env.deploy
+packs.json
+releases/
+covers/_sheet.png
+covers/_preview.png
+scripts/fmup-publish.exe

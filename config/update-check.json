@@ -1,0 +1,87 @@
+{
+  "_note": "Admin/seller only. `fmup-publish --updates` fetches each url, runs pattern, and compares the newest version it finds against `seen`. After you download+publish a new version, run `fmup-publish --mark-seen <id> <version>` so it stops flagging. `seen` \"0\" means only the base megapack is live, no monthly update applied yet. Patterns come from the FM27 Graphics Manager catalogue.",
+  "manual": {
+    "_note": "No reliable auto-check source; watch these by hand.",
+    "ids": [
+      "real-name-fix",
+      "trophies-pack",
+      "tcm-logos",
+      "fmg-metallic-logos",
+      "fmg-logos",
+      "fmsite-facepack",
+      "sortitoutsi-3d-kits"
+    ]
+  },
+  "packs": [
+    {
+      "id": "cut-out-player-faces",
+      "label": "Cut-Out Player Faces",
+      "pattern": "Version\\s+(\\d{4}\\.\\d{2})\\s+came out",
+      "seen": "2027.00",
+      "url": "https://fmportugal.net/en/cut-out-player-faces-fm27/"
+    },
+    {
+      "id": "df11-classic",
+      "label": "DF11 Classic",
+      "pattern": "href=\"(?<url>https://www\\.df11faces\\.com/post/df11-classic-megapack-fm27-update-file-(?<v>\\d+))\"",
+      "seen": "0",
+      "url": "https://www.df11faces.com/fm27-facepack-download"
+    },
+    {
+      "id": "fmg-standard-logos",
+      "label": "FMG Standard Logos",
+      "pattern": "href=\"(?<url>https://footballmanagergraphics\\.com/files/file/\\d+-(?:fm2\\d-)?fmg-standard-logos-update-(?<v>\\d{6})/?)\"",
+      "seen": "0",
+      "url": "https://footballmanagergraphics.com/files/category/146-fmg-standard-logos/"
+    },
+    {
+      "id": "fmg-plastic-logos",
+      "label": "FMG Plastic Logos",
+      "pattern": "href=\"(?<url>https://footballmanagergraphics\\.com/files/file/\\d+-(?:fm2\\d-)?fmg-plastic-logos-update-(?<v>\\d{6})/?)\"",
+      "seen": "0",
+      "url": "https://footballmanagergraphics.com/files/category/145-fmg-plastic-logos/"
+    },
+    {
+      "id": "fmg-vapour-logos",
+      "label": "FMG Vapour Logos",
+      "pattern": "href=\"(?<url>https://footballmanagergraphics\\.com/files/file/\\d+-(?:fm2\\d-)?fmg-vapour-logos-update-(?<v>\\d{6})/?)\"",
+      "seen": "0",
+      "url": "https://footballmanagergraphics.com/files/category/148-fmg-vapour-logos/"
+    },
+    {
+      "id": "fmg-grunge-logos",
+      "label": "FMG Grunge Logos",
+      "pattern": "href=\"(?<url>https://footballmanagergraphics\\.com/files/file/\\d+-(?:fm2\\d-)?(?:fmg-)?grunge-logos-update-(?<v>\\d{6})/?)\"",
+      "seen": "0",
+      "url": "https://footballmanagergraphics.com/files/category/141-fmg-grunge-logos/"
+    },
+    {
+      "id": "fmg-steel-logos",
+      "label": "FMG Steel Logos",
+      "pattern": "href=\"(?<url>https://footballmanagergraphics\\.com/files/file/\\d+-(?:fm2\\d-)?(?:fmg-)?steel-logos-update-(?<v>\\d{6})/?)\"",
+      "seen": "0",
+      "url": "https://footballmanagergraphics.com/files/category/147-fmg-steel-logos/"
+    },
+    {
+      "id": "fmv-logos",
+      "label": "FMV Logos",
+      "pattern": "href=\"(?<url>https://footballmanagergraphics\\.com/files/file/\\d+-(?:fm2\\d-)?(?:fmg-)?fmv-logos-update-(?<v>\\d{6})/?)\"",
+      "seen": "0",
+      "url": "https://footballmanagergraphics.com/files/category/149-fmv-logos/"
+    },
+    {
+      "id": "sortitoutsi-ss-kits",
+      "label": "sortitoutsi SS Kits",
+      "pattern": "(\\d{4}\\.\\d{2})\\s*-\\s*Released on",
+      "seen": "2027.02",
+      "url": "https://sortitoutsi.net/graphics/style/2/ss-kits"
+    },
+    {
+      "id": "sortitoutsi-3d-unity-kits",
+      "label": "sortitoutsi 3D Unity Kits",
+      "pattern": "(\\d{4}\\.\\d{2})\\s*-\\s*Released on",
+      "seen": "2027.02",
+      "url": "https://sortitoutsi.net/graphics/style/40/unity-3d-kits"
+    }
+  ]
+}
