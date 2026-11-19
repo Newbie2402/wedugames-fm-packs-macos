@@ -97,7 +97,11 @@ App ID di Apple Developer bisa pakai `com.wedugames.fmpacks`, sama dengan
   Interactive/Football Manager 27` — di macOS FM menyimpan data di
   Application Support, bukan Documents seperti di Windows.
 - **Real Name Fix (Database)**: folder `db/<versi>` berada di dalam bundle
-  game (`Football Manager 27.app/Contents/Resources/shared/data/database/db`).
+  game, tepatnya di plugin bundle bersarang:
+  `fm.app/Contents/PlugIns/game_plugin.bundle/Contents/Resources/shared/data/database/db`
+  (diverifikasi di Mac: install Steam FM 27 pakai `fm.app`, bukan
+  `Football Manager 27.app`). `resolve_db_dir()` di `crates/core/src/detect.rs`
+  mencari `Contents/Resources/...` langsung maupun di dalam `PlugIns/*.bundle`.
   Menulis ke dalam bundle membuat Steam menganggap file game berubah — sama
   seperti perilaku di Windows, dan umumnya aman. Kalau Gatekeeper/Steam
   protes: Steam → kanan → Properties → Installed Files → Verify integrity of

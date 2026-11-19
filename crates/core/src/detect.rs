@@ -44,7 +44,9 @@ impl GameInfo {
 }
 
 /// Where `shared/data/database/db` lives: next to the game on Windows, and on
-/// macOS inside the game's `.app` bundle (`Contents/Resources/...`).
+/// macOS inside the game's `.app` bundle. FM 27 on macOS keeps it in a nested
+/// plugin bundle (`fm.app/Contents/PlugIns/game_plugin.bundle/Contents/Resources/...`),
+/// so the app's own Resources and any `PlugIns/*.bundle` Resources are checked.
 fn resolve_db_dir(game_dir: &Path) -> Option<PathBuf> {
     let direct = game_dir.join(DB_SUBDIR);
     if direct.is_dir() {
@@ -53,16 +55,34 @@ fn resolve_db_dir(game_dir: &Path) -> Option<PathBuf> {
     let entries = std::fs::read_dir(game_dir).ok()?;
     for entry in entries.flatten() {
         let path = entry.path();
-        if !path.is_dir() || path.extension().and_then(|e| e.to_str()) != Some("app") {
-            continue;
+        if path.is_dir() && path.extension().and_then(|e| e.to_str()) == Some("app") {
+            if let Some(found) = db_in_bundle(&path) {
+                return Some(found);
+            }
         }
-        for nested in [
-            path.join("Contents/Resources").join(DB_SUBDIR),
-            path.join("Contents").join(DB_SUBDIR),
-            path.join(DB_SUBDIR),
-        ] {
-            if nested.is_dir() {
-                return Some(nested);
+    }
+    None
+}
+
+/// `shared/data/database/db` inside a macOS `.app` bundle: directly under
+/// `Contents/Resources`, or inside a nested `PlugIns/*.bundle` (FM 27's layout,
+/// where the database sits in `game_plugin.bundle`).
+fn db_in_bundle(bundle: &Path) -> Option<PathBuf> {
+    for cand in [
+        bundle.join("Contents/Resources").join(DB_SUBDIR),
+        bundle.join("Contents").join(DB_SUBDIR),
+        bundle.join(DB_SUBDIR),
+    ] {
+        if cand.is_dir() {
+            return Some(cand);
+        }
+    }
+    for entry in std::fs::read_dir(bundle.join("Contents/PlugIns")).ok()?.flatten() {
+        let nested = entry.path();
+        if nested.is_dir() && nested.extension().and_then(|e| e.to_str()) == Some("bundle") {
+            let cand = nested.join("Contents/Resources").join(DB_SUBDIR);
+            if cand.is_dir() {
+                return Some(cand);
             }
         }
     }
@@ -321,5 +341,21 @@ mod tests {
         }
         let g = GameInfo::from_dirs(t.path(), t.path(), None).unwrap();
         assert_eq!(g.db_versions, vec![2620, 2700]);
+    }
+
+    #[test]
+    fn finds_db_in_nested_plugin_bundle() {
+        // FM 27 on macOS: db lives in fm.app/Contents/PlugIns/game_plugin.bundle/
+        // Contents/Resources/shared/data/database/db, not the app's own Resources.
+        let t = tempfile::tempdir().unwrap();
+        let db = t
+            .path()
+            .join("fm.app/Contents/PlugIns/game_plugin.bundle/Contents/Resources")
+            .join(DB_SUBDIR)
+            .join("2620");
+        std::fs::create_dir_all(&db).unwrap();
+        let g = GameInfo::from_dirs(t.path(), t.path(), None).unwrap();
+        assert_eq!(g.db_versions, vec![2620]);
+        assert!(g.db_dir.ends_with(DB_SUBDIR));
     }
 }
